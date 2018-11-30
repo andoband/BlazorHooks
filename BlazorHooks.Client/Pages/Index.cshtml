@@ -1,0 +1,30 @@
+﻿@page "/"
+
+<h1>Iterating over ideas from React Hooks</h1>
+<p class="mb4 i f6">
+    Built using Blazor 0.7.0<br>
+    Based on examples from <a href="https://youtu.be/dpw9EHDh2bM?t=1048" target="_blank">Dan Abramov's talk</a> at React Conf 2018<br>
+    Entering text into textboxes updates document title (must tab out of box for demos 1 and 2, doesn't work in Edge).<br>
+    Resizing window updates the displayed width.<br>
+    None of these handle the case where the event source changes from one object to another while the component is in use.
+</p>
+
+<CascadingValue Value="theme">
+    <CascadingValue Value="locale">
+        <Demo1></Demo1>
+    </CascadingValue>
+</CascadingValue>
+
+<Demo2></Demo2>
+
+<Demo3></Demo3>
+
+<Demo4></Demo4>
+
+<Demo5></Demo5>
+
+@functions
+{
+    LocaleInfo locale = new LocaleInfo { LocaleName = "en-us (demo1)" };
+    ThemeInfo theme = new ThemeInfo { BgClassDemo1 = "bg-light-red" };
+}

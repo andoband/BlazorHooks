@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width">
+    <title>BlazorHooks</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/tachyons//tachyons.min.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+</head>
+<body>
+    <app>Loading...</app>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        var demo1 = {
+            // Multiple instances of the component would need to listen to event,
+            // so I'm choosing to keep track of them here 
+            listenersByComponentId: new Map(),
+
+            addResizeListener(componentRef, handlerName) {
+                // Create a handler for this component
+                const handleResize = () => componentRef.invokeMethod(handlerName, window.innerWidth);
+
+                // Hang onto the handler so it can be removed later
+                demo1.listenersByComponentId.set(componentRef._id, handleResize)
+
+                // Wire up the handler
+                window.addEventListener("resize", handleResize);
+            },
+
+            removeResizeListener(componentRef) {
+                const handleResize = demo1.listenersByComponentId.get(componentRef._id);
+                demo1.listenersByComponentId.delete(componentRef._id);
+                window.removeEventListener("resize", handleResize);
+            },
+
+            getWindowWidth() {
+                return window.innerWidth;
+            },
+
+            updateTitle(title) {
+                document.title = title;
+            }
+        };
+
+        var domWindow = {
+            dotNetWindowRef: null,
+
+            init(_dotNetWindowRef) {
+                domWindow.dotNetWindowRef = _dotNetWindowRef;
+
+                window.addEventListener("resize", () =>
+                    domWindow.dotNetWindowRef.invokeMethod("DomWindowResized", window.innerWidth));
+
+                return window.innerWidth;
+            },
+
+            setTitle: (title) => document.title = title
+        };
+    </script>
+</body>
+</html>

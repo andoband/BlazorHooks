@@ -1,0 +1,41 @@
+﻿@inherits SubscribeActions
+@inject ThemeInfo theme
+@inject LocaleInfo locale
+@inject DomWindow window
+
+<div class="mb4">
+    <div class="mb2 f3">Demo #5</div>
+
+    <div class="tl">
+        <ul>
+            <li>Uses dependency injection</li>
+            <li>Relies on <code>DomWindow</code> class for JS interop</li>
+            <li>Base class handles event subscribe/unsubscribe through <code>Subscribe(subscribeAction, unsubscribeAction)</code> method.</li>
+            <li>Base class provides <code>AfterRender(action)</code> to update document title</li>
+        </ul>
+    </div>
+
+    <div class="pa3 tc @theme.BgClassDemo5" style="width: 300px; box-shadow: 0 0 8px #666;">
+        <div class="mb1 f6 small-caps">Name</div>
+        <div><input placeholder="first name"  bind-value-oninput=@name /></div>
+        <div><input placeholder="surname" bind-value-oninput=@surname /></div>
+        <div class="mt3 mb1 f6 small-caps dark-gray">Width</div>
+        <div class="f4">@window.Width</div>
+        <div class="mt2 mb1 f6 small-caps dark-gray">Locale</div>
+        <div class="f4">@locale.LocaleName</div>
+    </div>
+</div>
+
+@functions
+{
+    string name;
+    string surname;
+
+    protected override void OnInit()
+    {
+        Subscribe(() => window.OnWindowResized += StateHasChanged, 
+                  () => window.OnWindowResized -= StateHasChanged);
+
+        AfterRender(() => window.SetTitle($"{name} {surname}"));
+    }
+}

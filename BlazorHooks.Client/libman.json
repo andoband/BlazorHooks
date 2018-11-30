@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "tachyons@4.11.1",
+      "destination": "wwwroot/css/tachyons",
+      "files": [ "tachyons.min.css" ]
+    }
+  ]
+}

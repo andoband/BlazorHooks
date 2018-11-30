@@ -1,0 +1,48 @@
+﻿@implements IDisposable
+@inject ThemeInfo theme
+@inject LocaleInfo locale
+@inject DomWindow window
+
+<div class="mb4">
+    <div class="mb2 f3">Demo #2</div>
+
+    <div class="tl">
+        <ul>
+            <li>Uses dependency injection</li>
+            <li>Relies on <code>DomWindow</code> class for JS interop</li>
+            <li>Implements <code>IDisposable</code> to unsubscribe from <code>resize</code> event.</li>
+            <li>Updates document title <code>onchange</code> of textboxes</li>
+        </ul>
+    </div>
+
+    <div class="pa3 tc @theme.BgClassDemo2" style="width: 300px; box-shadow: 0 0 8px #666;">
+        <div class="mb1 f6 small-caps">Name</div>
+        <div><input placeholder="first name"  bind-value-oninput=@name onchange=@UpdateTitle /></div>
+        <div><input placeholder="surname" bind-value-oninput=@surname onchange=@UpdateTitle /></div>
+        <div class="mt3 mb1 f6 small-caps dark-gray">Width</div>
+        <div class="f4">@window.Width</div>
+        <div class="mt2 mb1 f6 small-caps dark-gray">Locale</div>
+        <div class="f4">@locale.LocaleName</div>
+    </div>
+</div>
+
+@functions
+{
+    string name;
+    string surname;
+
+    protected override void OnInit()
+    {
+        window.OnWindowResized += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        window.OnWindowResized -= StateHasChanged;
+    }
+
+    private void UpdateTitle()
+    {
+        window.SetTitle($"{name} {surname}");
+    }
+}

@@ -1,0 +1,65 @@
+﻿@implements IDisposable
+
+<div class="mb4">
+    <div class="mb2 f3">Demo #1</div>
+
+    <div class="tl">
+        <ul>
+            <li>Uses cascading parameters</li>
+            <li>Does it's own JS interop</li>
+            <li>Implements <code>IDisposable</code> to unsubscribe from <code>resize</code> event.</li>
+            <li>Updates document title <code>onchange</code> of textboxes</li>
+        </ul>
+    </div>
+    
+    <div class="pa3 tc @Theme.BgClassDemo1" style="width: 300px; box-shadow: 0 0 8px #666;">
+        <div class="mb1 small-caps f6">Name</div>
+        <div><input placeholder="first name" bind-value-oninput=@name onchange=@UpdateTitle /></div>
+        <div><input placeholder="surname" bind-value-oninput=@surname onchange=@UpdateTitle /></div>
+        <div class="mt3 mb1 f6 small-caps dark-gray">Width</div>
+        <div class="f4">@windowWidth</div>
+        <div class="mt2 mb1 f6 small-caps dark-gray">Locale</div>
+        <div class="f4">@Locale.LocaleName</div>
+    </div>
+</div>
+
+@functions
+{
+    string name;
+    string surname;
+    int windowWidth;
+    DotNetObjectRef componentRef;
+
+    [CascadingParameter] LocaleInfo Locale { get; set; }
+    [CascadingParameter] ThemeInfo Theme { get; set; }
+
+    IJSInProcessRuntime js = (IJSInProcessRuntime)JSRuntime.Current; // Not neccessary but allows making sync js.Invoke<T>(...) calls
+
+    protected override void OnInit()
+    {
+        // Need to use a single DotNetObjectRef instance because the JS uses it's internal _id value 
+        // to associate the eventhandler with this ref.  This allows the JS to know which handler
+        // to unsubscribe when this instance of the component is removed.  There are other ways, not
+        // sure they're any better.
+        componentRef = new DotNetObjectRef(this);
+        js.Invoke<object>("demo1.addResizeListener", componentRef, nameof(Demo1WindowResized));
+
+        windowWidth = js.Invoke<int>("demo1.getWindowWidth");
+    }
+
+    public void Dispose()
+    {
+        js.Invoke<object>("demo1.removeResizeListener", componentRef);
+    }
+
+    private void UpdateTitle(UIChangeEventArgs evt)
+    {
+        js.Invoke<object>("demo1.updateTitle", $"{name} {surname}");
+    }
+
+    [JSInvokable]
+    public void Demo1WindowResized(int width) {
+        windowWidth = width;
+        StateHasChanged();
+    }
+}
